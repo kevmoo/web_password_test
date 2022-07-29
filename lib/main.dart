@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,33 +48,33 @@ class EmailForm extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const TextField(
+                  TextField(
                     autofocus: true,
+                    controller: _bob._emailController,
                     keyboardType: TextInputType.emailAddress,
-                    autofillHints: [
+                    autofillHints: const [
                       AutofillHints.email,
                     ],
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Email',
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     obscureText: true,
+                    controller: _bob._passwordController,
                     autofillHints: const [
                       AutofillHints.newPassword,
                     ],
-                    onSubmitted: (v) {
-                      _submit();
-                    },
+                    onSubmitted: (v) => _bob._submit(),
                     decoration: const InputDecoration(
                       labelText: 'Password',
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const ElevatedButton(
-                    onPressed: _submit,
-                    child: Text('Sign up'),
+                  ElevatedButton(
+                    onPressed: _bob._submit,
+                    child: const Text('Sign up'),
                   ),
                 ],
               ),
@@ -85,8 +86,29 @@ class EmailForm extends StatelessWidget {
   }
 }
 
-void _submit() {
-  print("done!");
+final _bob = _Bob();
+
+class _Bob {
+  _Bob() {
+    _emailController.addListener(() {
+      print(
+          ['email changed', _emailController.text, _emailController.selection]);
+    });
+    _passwordController.addListener(() {
+      print([
+        'password changed',
+        _passwordController.text,
+        _passwordController.selection
+      ]);
+    });
+  }
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  void _submit() {
+    print("done!");
+    TextInput.finishAutofillContext(shouldSave: true);
+  }
 }
 
 class MyHomePage extends StatefulWidget {
